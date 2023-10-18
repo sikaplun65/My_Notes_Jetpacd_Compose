@@ -1,4 +1,4 @@
-package com.example.mynotes.ui.theme
+package com.example.mynotes.presentation.theme
 
 import android.app.Activity
 import android.os.Build
