@@ -1,5 +1,7 @@
 package com.example.mynotes.presentation.main_screen
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -27,15 +29,16 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.navigation.NavHostController
-import com.example.mynotes.presentation.notes.NotesScreen
+import androidx.navigation.NavController
+import com.example.mynotes.presentation.notes.navigation.NotesScreensNavigation
 import com.example.mynotes.presentation.reminders.RemindersScreen
 import com.example.mynotes.presentation.shopping.ShoppingScreen
 import com.example.mynotes.presentation.tasks.TasksScreen
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun MainScreen(navHostController: NavHostController) {
+fun MainScreen(navController: NavController) {
     val tabItems = getTabItems()
 
     var selectedTabIndex by remember {
@@ -90,7 +93,7 @@ fun MainScreen(navHostController: NavHostController) {
             val selectedTabItem = tabItems[index]
             Box(modifier = Modifier.fillMaxSize()) {
                 when (selectedTabItem.title) {
-                    "Заметки" -> NotesScreen()
+                    "Заметки" -> NotesScreensNavigation(navController)
                     "Покупки" -> ShoppingScreen()
                     "Задачи" -> TasksScreen()
                     "Напоминания" -> RemindersScreen()

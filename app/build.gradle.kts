@@ -75,7 +75,9 @@ dependencies {
     implementation ("androidx.navigation:navigation-compose:2.7.3")
 
     implementation ("androidx.room:room-runtime:2.5.2")
-    annotationProcessor ("androidx.room:room-compiler:2.5.2")
+    kapt ("androidx.room:room-compiler:2.5.2")
+    implementation ("androidx.room:room-ktx:2.5.2")
+
 
     implementation ("com.google.dagger:hilt-android:2.47")
     implementation ("androidx.hilt:hilt-navigation-compose:1.1.0-alpha01")
