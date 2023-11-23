@@ -3,7 +3,6 @@ package com.example.mynotes.presentation.notes
 import android.annotation.SuppressLint
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -60,7 +59,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import com.example.mynotes.domain.model.Note
 import com.example.mynotes.presentation.notes.components.BottomSheetContent
 import com.example.mynotes.presentation.notes.components.NoteItem
 import com.example.mynotes.presentation.notes.components.NotesScreenAppBar
@@ -72,7 +70,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "UnrememberedMutableState")
 @Composable
 fun NotesScreen(
@@ -81,8 +79,7 @@ fun NotesScreen(
 ) {
     val state = viewModel.state.value
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
-    val scroll = scrollBehavior.state.collapsedFraction// может это
-    val context = LocalContext.current
+    val isOrderSectionVisibleCurrently = remember { mutableStateOf(false) }
 
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -100,15 +97,16 @@ fun NotesScreen(
         }
     }
 
-    val scrollState = rememberLazyListState()
-    LaunchedEffect(scrollState){
-        snapshotFlow {scrollState.isScrollInProgress }
-            .distinctUntilChanged()
-            .collect{ isScrolling ->
-                if (isScrolling){
-                    viewModel.onEvent(NotesEvent.ToggleOrderSection)
-                }
-            }
+    LaunchedEffect(key1 = scrollBehavior.state.collapsedFraction == 1f){
+        if (state.isOrderSectionVisible) {
+            viewModel.onEvent(NotesEvent.ToggleOrderSection)
+        }
+    }
+
+    LaunchedEffect(key1 = scrollBehavior.state.collapsedFraction == 0f){
+        if (isOrderSectionVisibleCurrently.value) {
+            viewModel.onEvent(NotesEvent.ToggleOrderSection)
+        }
     }
 
     if (shouldBottomSheetShow) {
@@ -191,8 +189,7 @@ fun NotesScreen(
                     }
                 }
             }
-        }
-        else {
+        } else {
             Scaffold(
                 modifier = Modifier
                     .nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -211,6 +208,7 @@ fun NotesScreen(
                         },
                         onIconSortedClicked = {
                             viewModel.onEvent(NotesEvent.ToggleOrderSection)
+                            isOrderSectionVisibleCurrently.value = !isOrderSectionVisibleCurrently.value
                         },
                         isSortSectionVisible = state.isOrderSectionVisible
                     )
@@ -259,7 +257,6 @@ fun NotesScreen(
                         )
                     }
                     LazyColumn(
-//                        state = scrollState,
                         modifier = Modifier
                             .padding(top = topPadding)
                             .nestedScroll(scrollBehavior.nestedScrollConnection),
